@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { BrowserRouter as Router, Route, Link, Switch } from "react-router-dom";
+import { Route, Switch } from "react-router-dom";
 
 import KaydedilenlerListesi from "./Filmler/KaydedilenlerListesi";
 import FilmListesi from "./Filmler/FilmListesi";
-
+import Film from "./Filmler/Film";
 export default function App() {
   const [saved, setSaved] = useState([]); // Stretch: the ids of "saved" movies
   const [movieList, setMovieList] = useState([]);
@@ -28,20 +28,32 @@ export default function App() {
 
   const KaydedilenlerListesineEkle = (id) => {
     // Burası esnek. Aynı filmin birden fazla kez "saved" e eklenmesini engelleyin
-    setSaved();
+    let isSaved = saved.find((x) => x.id == id);
+    if (!isSaved) {
+      let savedMovie = movieList.find((x) => x.id == id);
+
+      console.log("id", id);
+      console.log("movielist", movieList);
+      console.log("savedMovie", savedMovie);
+      let newSaved = [...saved, savedMovie];
+      setSaved(newSaved);
+    }
   };
 
   return (
-    <Switch>
-      <Route path="/about">
-        <KaydedilenlerListesi list={saved} />
-      </Route>
-      <Route path="/users">
-        <Users />
-      </Route>
-      <Route path="/">
-        <FilmListesi movieList={movieList} />
-      </Route>
-    </Switch>
+    <div>
+      <KaydedilenlerListesi list={saved} />
+      <div>
+        <Switch>
+          <Route path="/filmler/:id">
+            <Film savetoList={KaydedilenlerListesineEkle} />
+          </Route>
+
+          <Route path="/">
+            <FilmListesi movieList={movieList} />
+          </Route>
+        </Switch>
+      </div>
+    </div>
   );
 }
